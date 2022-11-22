@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+
+<!--
+Copyright (c) 2022, ARTEL ROBOTICS.
+
+All rights reserved.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+
+<robot name="artel_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!--Includes-->
+  <xacro:include filename="$(find camel_urdf)/urdf/zed_macro.urdf.xacro" />
+  
+
+  <!--Arguments-->
+  <xacro:arg name="robot_model"  default='leo'/>
+  <xacro:arg name="base_frame"   default="base_link" />
+  
+  <!--Properties-->
+  <xacro:property name="M_PI"     value="3.1415926535897931" />
+  <xacro:property name="model"    value="$(arg robot_model)/" />
+  <xacro:property name="baseline"     value="0.12" />
+  <xacro:property name="optical_offset_x" value="-0.01" />
+  
+  <xacro:if value="${model == 'no/'}">
+        <xacro:property name="model" value="" />
+  </xacro:if>
+  
+  <!-- base_link -->
+  <link name="${model}$(arg base_frame)">
+    <!-- <visual>
+      <geometry>
+        <mesh filename="package://camel_urdf/meshes/CAMEL-1000.stl" scale="0.001 0.001 0.001"/> />
+      </geometry>
+      <origin rpy="0 0 ${-M_PI/2}" xyz="0 0 0"/> 
+    </visual>-->
+
+  </link>
+  
+  <!--Laser-->
+  <joint name="$(arg base_frame)_laser_joint" type="fixed">
+      <parent link="${model}$(arg base_frame)"/>
+      <child link="${model}laser"/>
+      <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="${model}laser">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+  </link>
+
+  <!--Base_Footprint-->
+  <joint name="$(arg base_frame)_base_footprint_joint" type="fixed">
+      <parent link="${model}$(arg base_frame)"/>
+      <child link="${model}base_footprint"/>
+      <origin xyz="0.0 0.0 -0.12" rpy="0 0 0"/>
+  </joint>
+
+  <link name="${model}base_footprint">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+  </link>
+
+  <!--Left Wheel-->
+  <joint name="$(arg base_frame)_left_wheel_joint" type="fixed">
+      <parent link="${model}base_footprint"/>
+      <child link="${model}left_wheel"/>
+      <origin xyz="-0.1435 0.1825 0.085" rpy="0 0 0"/>
+  </joint>
+
+  <link name="${model}left_wheel">
+      <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+  </link>
+  
+  <!--Right Wheel-->
+  <joint name="$(arg base_frame)_right_wheel_joint" type="fixed">
+      <parent link="${model}base_footprint"/>
+      <child link="${model}right_wheel"/>
+      <origin xyz="-0.1435 -0.1825 0.085" rpy="0 0 0"/>
+  </joint>
+
+  <link name="${model}right_wheel">
+        <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />   
+  </link>
+  
+  <!--Intel RealSense Front Camera Center-->
+  <xacro:zed_camera name="${model}intel_realsense" model="zed2" parent="${model}base_footprint">
+    <origin xyz="0.2825 0 0.17" rpy="0 0 0" />
+  </xacro:zed_camera>
+
+
+  <!--Front Lidar-->
+  <joint name="$(arg base_frame)_front_lidar_joint" type="fixed">
+      <parent link="${model}base_footprint"/>
+      <child link="${model}front_lidar"/>
+      <origin xyz="0.17 0.17 0.25" rpy="0 0 ${-M_PI/4}"/>
+  </joint>
+
+  <link name="${model}front_lidar">
+        <origin xyz="0 0 0" rpy="0 0 0" />        
+  </link>
+
+  <!--Back Lidar-->
+  <joint name="$(arg base_frame)_back_lidar_joint" type="fixed">
+      <parent link="${model}base_footprint"/>
+      <child link="${model}back_lidar"/>
+      <origin xyz="-0.17 -0.17 0.25" rpy="0 0 ${3*M_PI/4}"/>
+  </joint>
+
+  <link name="${model}back_lidar">
+        <origin xyz="0.0 0.0 0" rpy="0 0 0" />        
+  </link>
+
+  <!--IMU-->
+  <joint name="$(arg base_frame)_imu_joint" type="fixed">
+      <parent link="${model}base_footprint"/>
+      <child link="${model}imu"/>
+      <origin xyz="0 0.0 0.0" rpy="0 0 0"/>
+  </joint>
+
+  <link name="${model}imu">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.01 0.01 0.01"/>
+        </geometry>
+        <material name="white"/>
+      </visual>
+  </link>
+
+</robot>

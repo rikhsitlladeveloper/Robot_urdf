@@ -1,0 +1,19 @@
+<launch>
+
+  <arg name="robot_model" default="$(optenv ROBOT_NAME no)" doc="model type [no, CAMEL-1000]"/> <!--type "no" for publish without tf prefix or name of tf prefix-->
+  <arg name="base_frame"  default="base_link" />
+  <arg name="rvizconfig" default="$(find camel_urdf)/rviz/urdf.rviz" />
+  <group ns="robot_1">
+
+    <param name="robot_description" command="$(find xacro)/xacro '$(find camel_urdf)/urdf/leo.urdf.xacro' 
+                                             robot_model:=$(arg robot_model)
+                                             base_frame:=$(arg base_frame)"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" output="screen" required="true">
+
+        <remap from="robot_description" to="robot_description" />
+    <param name="publish_frequency" type="double" value="50.0" />
+    
+    </node>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" />
+  </group>
+</launch>
