@@ -26,7 +26,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   
 
   <!--Arguments-->
-  <xacro:arg name="robot_model"  default='Camel-1000'/>
+  <xacro:arg name="robot_model"  default='leo'/>
   <xacro:arg name="base_frame"   default="base_link" />
   
   <!--Properties-->
@@ -43,9 +43,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <link name="${model}$(arg base_frame)">
     <visual>
       <geometry>
-        <mesh filename="package://camel_urdf/meshes/CAMEL-1000.stl" scale="0.001 0.001 0.001"/> />
+        <mesh filename="package://camel_urdf/meshes/LEO.stl" scale="0.001 0.001 0.001"/> />
       </geometry>
-      <origin rpy="0 0 ${-M_PI/2}" xyz="0 0 0"/>
+      <origin rpy="0 0 ${M_PI/2}" xyz="0 0 0"/> 
     </visual>
 
   </link>
@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <joint name="$(arg base_frame)_base_footprint_joint" type="fixed">
       <parent link="${model}$(arg base_frame)"/>
       <child link="${model}base_footprint"/>
-      <origin xyz="0.0 0.0 -0.177902" rpy="0 0 0"/>
+      <origin xyz="0.0 0.0 -0.11" rpy="0 0 0"/>
   </joint>
 
   <link name="${model}base_footprint">
@@ -74,9 +74,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <!--Left Wheel-->
   <joint name="$(arg base_frame)_left_wheel_joint" type="fixed">
-      <parent link="${model}$(arg base_frame)"/>
+      <parent link="${model}base_footprint"/>
       <child link="${model}left_wheel"/>
-      <origin xyz="0.045606 0.394041 -0.068237" rpy="0 0 0"/>
+      <origin xyz="-0.1435 0.1825 0.085" rpy="0 0 0"/>
   </joint>
 
   <link name="${model}left_wheel">
@@ -85,32 +85,33 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   
   <!--Right Wheel-->
   <joint name="$(arg base_frame)_right_wheel_joint" type="fixed">
-      <parent link="${model}$(arg base_frame)"/>t_
+      <parent link="${model}base_footprint"/>
       <child link="${model}right_wheel"/>
-      <origin xyz="0.045606 -0.394041 -0.068237" rpy="0 0 0"/>
+      <origin xyz="-0.1435 -0.1825 0.085" rpy="0 0 0"/>
   </joint>
 
   <link name="${model}right_wheel">
         <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />   
   </link>
   
-  <!--Zed Front Camera Center-->
-  <xacro:zed_camera name="${model}zed_front" model="zed2" parent="${model}$(arg base_frame)">
-    <origin xyz="0.75 0 0" rpy="0 0 0" />
-  </xacro:zed_camera>
+  <!--Intel RealSense Front Camera Center-->
+  <joint name="$(arg base_frame)_front_camera_joint" type="fixed">
+      <parent link="${model}base_footprint"/>
+      <child link="${model}front_camera"/>
+      <origin xyz="0.2825 0.0 0.155" rpy="0 0 0"/>
+  </joint>
+
+  <link name="${model}front_camera">
+        <origin xyz="0 0 0" rpy="0 0 0" />        
+  </link>
 
 
-  <!--Zed Back Camera Center-->
-  <xacro:zed_camera name="${model}zed_back" model="zed2" parent="${model}$(arg base_frame)">
-    <origin xyz="-0.75 0 0" rpy="0 0 ${M_PI}" />
-  </xacro:zed_camera>
 
- 
   <!--Front Lidar-->
   <joint name="$(arg base_frame)_front_lidar_joint" type="fixed">
-      <parent link="${model}$(arg base_frame)"/>
+      <parent link="${model}base_footprint"/>
       <child link="${model}front_lidar"/>
-      <origin xyz="0.920227 -0.52248 -0.10747" rpy="0 0 ${-M_PI/4}"/>
+      <origin xyz="0.17 0.17 0.22" rpy="0 0 ${-3*M_PI/4}"/>
   </joint>
 
   <link name="${model}front_lidar">
@@ -119,9 +120,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <!--Back Lidar-->
   <joint name="$(arg base_frame)_back_lidar_joint" type="fixed">
-      <parent link="${model}$(arg base_frame)"/>
+      <parent link="${model}base_footprint"/>
       <child link="${model}back_lidar"/>
-      <origin xyz="-0.758794 0.513232 -0.103231" rpy="0 0 ${3*M_PI/4}"/>
+      <origin xyz="-0.17 -0.17 0.22" rpy="0 0 ${M_PI/4}"/>
   </joint>
 
   <link name="${model}back_lidar">
@@ -130,9 +131,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
   <!--IMU-->
   <joint name="$(arg base_frame)_imu_joint" type="fixed">
-      <parent link="${model}$(arg base_frame)"/>
+      <parent link="${model}base_footprint"/>
       <child link="${model}imu"/>
-      <origin xyz="0.3756 0.0 0.113" rpy="0 0 0"/>
+      <origin xyz="0 0.0 0.0" rpy="0 0 0"/>
   </joint>
 
   <link name="${model}imu">
@@ -143,18 +144,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </geometry>
         <material name="white"/>
       </visual>
-  </link>
-
-  <!--Charge Reciver-->
-  <joint name="$(arg base_frame)_charge_reciver_joint" type="fixed">
-      <parent link="${model}$(arg base_frame)"/>
-      <child link="${model}charge_reciver"/>
-      <origin xyz="-0.45 0.5 0" rpy="0 0 ${M_PI/2}"/>
-  </joint>
-  
-  <link name="${model}charge_reciver">
-        <origin xyz="0 0 0" rpy="0 0 0" />
-     
   </link>
 
 </robot>
